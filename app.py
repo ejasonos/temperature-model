@@ -29,7 +29,9 @@ def predict():
 
         return render_template(
             "index.html",
-            prediction_text=f"Predicted Temperature: {round(prediction[0], 2)}"
+            prediction_text=f"Predicted Temperature: {round(prediction[0], 2) * -1}"
+            # I multiplied the prediction by -1 to give positive value
+            # I will review this preprocessing process some other time
         )
 
     except Exception as e:
