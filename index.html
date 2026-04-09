@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Temperature Prediction</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input {
+            padding: 10px;
+            margin: 8px;
+            width: 250px;
+        }
+        button {
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Weather Temperature Predictor</h1>
+
+    <form action="/predict" method="POST">
+
+        <input type="number" step="any" name="humidity" placeholder="Humidity (%)" required><br>
+
+        <input type="number" step="any" name="windspeed" placeholder="Wind Speed (mph)" required><br>
+
+        <input type="number" step="any" name="rainfall" placeholder="Rainfall (%)" required><br>
+
+        <button type="submit">Predict Temperature</button>
+    </form>
+
+    <h2>{{ prediction_text }}</h2>
+
+</body>
+</html>
