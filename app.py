@@ -2,42 +2,39 @@ from flask import Flask, request, render_template
 import pickle
 import numpy as np
 
-# Load the trained regression model
-model_path = 'model.pkl'
-with open(model_path, 'rb') as file:
-    model = pickle.load(file)
-
 app = Flask(__name__)
 
-@app.route('/')
+# Load model safely
+try:
+    with open("model.pkl", "rb") as file:
+        model = pickle.load(file)
+except Exception as e:
+    model = None
+    print("Error loading model:", e)
+
+
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # Get values from form
-        humidity = float(request.form['humidity'])
-        windspeed = float(request.form['windspeed'])
-        rainfall = float(request.form['rainfall'])
+        # Convert inputs to float (better than int for temperature data)
+        features = [float(x) for x in request.form.values()]
+        final_features = np.array([features])
 
-        # Arrange in same order used during training
-        features = np.array([[humidity, windspeed, rainfall]])
-
-        # Predict temperature
-        prediction = model.predict(features)
-
-        output = round(prediction[0], 2)
+        prediction = model.predict(final_features)
 
         return render_template(
-            'index.html',
-            prediction_text=f"Predicted Temperature: {output} °C"
+            "index.html",
+            prediction_text=f"Predicted Temperature: {round(prediction[0], 2)}"
         )
 
     except Exception as e:
         return render_template(
-            'index.html',
+            "index.html",
             prediction_text=f"Error: {str(e)}"
         )
 
