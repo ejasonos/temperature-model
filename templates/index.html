@@ -1,39 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Temperature Prediction</title>
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            margin-top: 50px;
-        }
-        input {
-            padding: 10px;
-            margin: 8px;
-            width: 250px;
-        }
-        button {
-            padding: 10px 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Temperature Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    /* --- Background Gradient Animation --- */
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+        0% {background-position:0% 50%;}
+        50% {background-position:100% 50%;}
+        100% {background-position:0% 50%;}
+    }
+
+    /* --- Glassmorphic Card --- */
+    .card {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 40px;
+        width: 350px;
+        text-align: center;
+        position: relative;
+        perspective: 1000px;
+        animation: floatCard 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatCard {
+        0% { transform: rotateY(0deg) translateY(0px); }
+        50% { transform: rotateY(5deg) translateY(-10px); }
+        100% { transform: rotateY(-5deg) translateY(0px); }
+    }
+
+    h1 {
+        color: #fff;
+        margin-bottom: 30px;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        font-size: 1.8rem;
+    }
+
+    /* --- Input Fields --- */
+    input {
+        width: 80%;
+        padding: 12px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+        font-size: 1rem;
+        text-align: center;
+        backdrop-filter: blur(5px);
+        transition: 0.3s all ease-in-out;
+    }
+
+    input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    input:focus {
+        background: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        transform: scale(1.05);
+    }
+
+    /* --- Button --- */
+    button {
+        margin-top: 20px;
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(45deg, #6a11cb, #2575fc);
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: 0.4s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        background: linear-gradient(45deg, #2575fc, #6a11cb);
+    }
+
+    /* --- Prediction Text --- */
+    h2 {
+        margin-top: 25px;
+        color: #fff;
+        font-weight: 700;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        min-height: 30px;
+        transition: all 0.5s ease-in-out;
+    }
+
+    /* --- Floating Particles / Simulation --- */
+    .particle {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        animation: floatParticle 8s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes floatParticle {
+        0% { transform: translateY(0) translateX(0) scale(1); opacity:1; }
+        50% { transform: translateY(-400px) translateX(50px) scale(0.8); opacity:0.7; }
+        100% { transform: translateY(-800px) translateX(-50px) scale(0.5); opacity:0; }
+    }
+</style>
 </head>
 <body>
 
+<!-- Floating particles -->
+<div class="particle" style="left:20%; animation-delay:0s;"></div>
+<div class="particle" style="left:50%; animation-delay:2s;"></div>
+<div class="particle" style="left:80%; animation-delay:4s;"></div>
+
+<div class="card">
     <h1>Weather Temperature Predictor</h1>
-
-    <form action="/predict" method="POST">
-
+    <form method="POST">
         <input type="number" step="any" name="humidity" placeholder="Humidity (%)" required><br>
-
         <input type="number" step="any" name="windspeed" placeholder="Wind Speed (mph)" required><br>
-
         <input type="number" step="any" name="rainfall" placeholder="Rainfall (%)" required><br>
-
         <button type="submit">Predict Temperature</button>
     </form>
-
     <h2>{{ prediction_text }}</h2>
+</div>
 
 </body>
 </html>
