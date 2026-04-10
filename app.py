@@ -101,11 +101,11 @@ def predict():
         # =========================
         prediction = scaler_y.inverse_transform(scaled_output)
 
-        temp = prediction[0][0]
+        temp = round(prediction[0][0], 1)
 
         return render_template(
             "index.html",
-            prediction_text=f"Predicted Temperature: {round(temp, 2)} °C"
+            prediction_text=f"Predicted Temperature: {round(temp, 1)}°C"
         )
 
     except Exception as e:
