@@ -1,27 +1,54 @@
 from flask import Flask, request, render_template
 import numpy as np
 import torch
+import torch.nn as nn
 import pickle
 
-from model import TemperatureNN
-
 app = Flask(__name__)
+
+# =========================
+# MODEL (INLINE - NO model.py)
+# =========================
+class TemperatureNN(nn.Module):
+    def __init__(self):
+        super(TemperatureNN, self).__init__()
+
+        self.net = nn.Sequential(
+            nn.Linear(3, 16),
+            nn.ReLU(),
+            nn.Linear(16, 32),
+            nn.ReLU(),
+            nn.Linear(32, 1)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
+# =========================
+# FEATURE CONFIG (CLEAN & SAFE)
+# =========================
+FEATURES = ["humidity", "windspeed", "rainfall"]
+
 
 # =========================
 # LOAD MODEL + SCALERS
 # =========================
 try:
-    # Load PyTorch model
     model = TemperatureNN()
-    model.load_state_dict(torch.load("temperature_model.pth", map_location="cpu"))
+
+    model.load_state_dict(
+        torch.load("temperature_model.pth", map_location="cpu")
+    )
     model.eval()
 
-    # Load scalers using open() + pickle
     with open("scaler_X.pkl", "rb") as f:
         scaler_X = pickle.load(f)
 
     with open("scaler_y.pkl", "rb") as f:
         scaler_y = pickle.load(f)
+
+    print("Model and scalers loaded successfully")
 
 except Exception as e:
     model = None
@@ -46,13 +73,11 @@ def predict():
 
     try:
         # =========================
-        # GET INPUTS (must match form order)
+        # CLEAN FEATURE EXTRACTION
         # =========================
-        humidity = float(request.form["humidity"])
-        windspeed = float(request.form["windspeed"])
-        rainfall = float(request.form["rainfall"])
-
-        features = np.array([[humidity, windspeed, rainfall]])
+        features = np.array([
+            [float(request.form[key]) for key in FEATURES]
+        ])
 
         # =========================
         # SCALE INPUT
@@ -60,10 +85,13 @@ def predict():
         features_scaled = scaler_X.transform(features)
 
         # =========================
-        # PREDICT WITH PYTORCH MODEL
+        # CONVERT TO TENSOR
         # =========================
         tensor_input = torch.tensor(features_scaled, dtype=torch.float32)
 
+        # =========================
+        # PREDICTION
+        # =========================
         with torch.no_grad():
             scaled_output = model(tensor_input).numpy()
 
@@ -86,5 +114,8 @@ def predict():
         )
 
 
+# =========================
+# MAIN ENTRY
+# =========================
 if __name__ == "__main__":
     app.run(debug=True)
