@@ -1,18 +1,38 @@
 from flask import Flask, request, render_template
-import pickle
 import numpy as np
+import torch
+import pickle
+
+from model import TemperatureNN
 
 app = Flask(__name__)
 
-# Load model safely
+# =========================
+# LOAD MODEL + SCALERS
+# =========================
 try:
-    with open("model.pkl", "rb") as file:
-        model = pickle.load(file)
+    # Load PyTorch model
+    model = TemperatureNN()
+    model.load_state_dict(torch.load("temperature_model.pth", map_location="cpu"))
+    model.eval()
+
+    # Load scalers using open() + pickle
+    with open("scaler_X.pkl", "rb") as f:
+        scaler_X = pickle.load(f)
+
+    with open("scaler_y.pkl", "rb") as f:
+        scaler_y = pickle.load(f)
+
 except Exception as e:
     model = None
-    print("Error loading model:", e)
+    scaler_X = None
+    scaler_y = None
+    print("Error loading model/scalers:", e)
 
 
+# =========================
+# ROUTES
+# =========================
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -20,18 +40,43 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    try:
-        # Convert inputs to float (better than int for temperature data)
-        features = [float(x) for x in request.form.values()]
-        final_features = np.array([features])
 
-        prediction = model.predict(final_features)
+    if model is None:
+        return render_template("index.html", prediction_text="Model not loaded")
+
+    try:
+        # =========================
+        # GET INPUTS (must match form order)
+        # =========================
+        humidity = float(request.form["humidity"])
+        windspeed = float(request.form["windspeed"])
+        rainfall = float(request.form["rainfall"])
+
+        features = np.array([[humidity, windspeed, rainfall]])
+
+        # =========================
+        # SCALE INPUT
+        # =========================
+        features_scaled = scaler_X.transform(features)
+
+        # =========================
+        # PREDICT WITH PYTORCH MODEL
+        # =========================
+        tensor_input = torch.tensor(features_scaled, dtype=torch.float32)
+
+        with torch.no_grad():
+            scaled_output = model(tensor_input).numpy()
+
+        # =========================
+        # INVERSE SCALE OUTPUT
+        # =========================
+        prediction = scaler_y.inverse_transform(scaled_output)
+
+        temp = prediction[0][0]
 
         return render_template(
             "index.html",
-            prediction_text=f"Predicted Temperature: {round(prediction[0], 2) * -1}"
-            # I multiplied the prediction by -1 to give positive value
-            # I will review this preprocessing process some other time
+            prediction_text=f"Predicted Temperature: {round(temp, 2)} °C"
         )
 
     except Exception as e:
