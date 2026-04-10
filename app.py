@@ -37,9 +37,7 @@ FEATURES = ["humidity", "windspeed", "rainfall"]
 try:
     model = TemperatureNN()
 
-    model.load_state_dict(
-        torch.load("temperature_model.pth", map_location="cpu")
-    )
+    model.load_state_dict(torch.load("temperature_model.pth", map_location="cpu"))
     model.eval()
 
     with open("scaler_X.pkl", "rb") as f:
@@ -51,6 +49,8 @@ try:
     print("Model and scalers loaded successfully")
 
 except Exception as e:
+    print("FULL ERROR TRACE:")
+    print(traceback.format_exc())
     model = None
     scaler_X = None
     scaler_y = None
