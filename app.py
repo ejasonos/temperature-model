@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import pickle
+import os
 
 app = Flask(__name__)
 
@@ -118,4 +119,5 @@ def predict():
 # MAIN ENTRY
 # =========================
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
