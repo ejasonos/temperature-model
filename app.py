@@ -5,6 +5,7 @@ import torch.nn as nn
 import pickle
 import os
 import traceback
+import math
 
 app = Flask(__name__)
 
@@ -101,11 +102,12 @@ def predict():
         # =========================
         prediction = scaler_y.inverse_transform(scaled_output)
 
-        temp = round(prediction[0][0], 1)
+        temp = prediction[0][0]
+        truncate_temp = math.trunc(temp * 10) / 10
 
         return render_template(
             "index.html",
-            prediction_text=f"Predicted Temperature: {round(temp, 1)}°C"
+            prediction_text=f"Predicted Temperature: {truncate_temp}°C"
         )
 
     except Exception as e:
