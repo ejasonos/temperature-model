@@ -38,7 +38,6 @@ FEATURES = ["humidity", "windspeed", "rainfall"]
 # =========================
 try:
     model = TemperatureNN()
-
     model.load_state_dict(torch.load("temperature_model.pth", map_location="cpu"))
     model.eval()
 
@@ -47,7 +46,7 @@ try:
 
     with open("scaler_y.pkl", "rb") as f:
         scaler_y = pickle.load(f)
-
+    
     print("Model and scalers loaded successfully")
 
 except Exception as e:
