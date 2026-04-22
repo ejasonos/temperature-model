@@ -225,16 +225,18 @@
     <h2 class="title">AI Prompt Engine</h2>
 
         <label class="label">Prompt</label>
-        <input class="input" type="text" name="prompt" maxlength="150"  placeholder="Type your instruction..." style="color:dark blue;">
+        <input id="prompt" class="input" type="text" name="prompt" maxlength="150"  placeholder="Type your instruction..." style="color:darkblue;">
 
-        <button class="btn" onclick="send()">Generate</button>
+        <button type="button" class="btn" onclick="send()">Generate</button>
 
-    <div class="output" id=" out"></div>
+    <pre class="output" id=" out"></pre>
 </section>
 
 <script>
 async function send() {
     const prompt = document.getElementById("prompt").value;
+
+    console.log("Sending prompt:", prompt);
 
     const res = await fetch("/generate", {
         method: "POST",
@@ -244,7 +246,10 @@ async function send() {
         body: JSON.stringify({ prompt })
     });
 
+    console.log("Response status:", res.status);
+
     const data = await res.json();
+    console.log("Response data:", data);
 
     document.getElementById("out").innerText =
         data.response || data.error || "No response";
