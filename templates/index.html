@@ -201,10 +201,6 @@
 
     border: 1px solid rgba(255,255,255,0.1);
 }
-
-.ai-card .output-label {
-    margin-top: 14px;
-}
 </style>
 </head>
 <body>
@@ -228,5 +224,17 @@
 <div class="ai-card">
     <h2 class="title">AI Prompt Engine</h2>
 
+    <!-- FORM ONLY (NO JS) -->
+    <form method="POST" action="/generate">
+        <label class="label">Prompt</label>
+        <input class="input" type="text" name="prompt" placeholder="Type your instruction..." required>
+
+        <button class="btn" type="submit">Generate</button>
+    </form>
+
+    {% if response %}
+    <div class="output">{{ response }}</div>
+    {% endif %}
+</div>
 </body>
 </html>
