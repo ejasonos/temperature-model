@@ -11,9 +11,11 @@ import math
 
 app = Flask(__name__)
 
+HF_TOKEN = os.getenv("HF_TOKEN")
+
 API_URL = "https://api-inference.huggingface.co/models/gpt2"
 HEADERS = {
-    "Authorization": "Bearer YOUR_HF_TOKEN"
+    "Authorization": f"Bearer {HF_TOKEN}"
 }
 
 def query(prompt):
