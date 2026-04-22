@@ -121,10 +121,10 @@ def predict():
             prediction_text=f"Error: {str(e)}"
         )
 
+
 @app.route("/generate", methods=["POST"])
 def generate():
-    data = request.get_json()
-    prompt = data.get("prompt", "")
+    prompt = request.form["prompt"]
 
     output = generator(
         prompt,
@@ -133,12 +133,14 @@ def generate():
         temperature=0.7
     )
 
-    response = output[0]["generated_text"].replace(prompt, "").strip()
-    return jsonify({"response": response})
+    text = output[0]["generated_text"]
+    response = text.replace(prompt, "").strip()
+
+    return render_template("index.html", response=response)
 
 # =========================
 # MAIN ENTRY
 # =========================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True,host="0.0.0.0", port=port)
