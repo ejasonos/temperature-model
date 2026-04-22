@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify
-
 import requests
 import numpy as np
 import torch
@@ -11,7 +10,13 @@ import math
 
 app = Flask(__name__)
 
+# =========================
+# HF API
+# =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
+
+if not HF_TOKEN:
+    raise ValueError("HF_TOKEN not set in environment variables")
 
 API_URL = "https://api-inference.huggingface.co/models/gpt2"
 HEADERS = {
@@ -19,30 +24,36 @@ HEADERS = {
 }
 
 def query(prompt):
-    payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_new_tokens": 50,
-            "temperature": 0.7
+    try:
+        payload = {
+            "inputs": prompt,
+            "parameters": {
+                "max_new_tokens": 50,
+                "temperature": 0.7
+            }
         }
-    }
 
-    response = requests.post(API_URL, headers=HEADERS, json=payload)
-    data = response.json()
+        response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=30)
+        data = response.json()
 
-    # Handle response safely
-    if isinstance(data, list):
-        return data[0]["generated_text"].replace(prompt, "").strip()
-    else:
-        return "Error: " + str(data)
+        if isinstance(data, dict) and "error" in data:
+            return f"HF Error: {data['error']}"
+
+        if isinstance(data, list) and "generated_text" in data[0]:
+            return data[0]["generated_text"].replace(prompt, "").strip()
+
+        return str(data)
+
+    except Exception as e:
+        return f"Request failed: {str(e)}"
+
 
 # =========================
 # MODEL
 # =========================
 class TemperatureNN(nn.Module):
     def __init__(self):
-        super(TemperatureNN, self).__init__()
-
+        super().__init__()
         self.net = nn.Sequential(
             nn.Linear(3, 16),
             nn.ReLU(),
@@ -55,14 +66,11 @@ class TemperatureNN(nn.Module):
         return self.net(x)
 
 
-# =========================
-# FEATURE CONFIG (CLEAN & SAFE)
-# =========================
 FEATURES = ["humidity", "windspeed", "rainfall"]
 
 
 # =========================
-# LOAD MODEL + SCALERS
+# LOAD MODEL
 # =========================
 try:
     model = TemperatureNN()
@@ -74,16 +82,14 @@ try:
 
     with open("scaler_y.pkl", "rb") as f:
         scaler_y = pickle.load(f)
-    
-    print("Model and scalers loaded successfully")
 
-except Exception as e:
-    print("FULL ERROR TRACE:")
+    print("Model loaded successfully")
+
+except Exception:
     print(traceback.format_exc())
     model = None
     scaler_X = None
     scaler_y = None
-    print("Error loading model/scalers:", e)
 
 
 # =========================
@@ -96,37 +102,20 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-
     if model is None:
         return render_template("index.html", prediction_text="Model not loaded")
 
     try:
-        # =========================
-        # CLEAN FEATURE EXTRACTION
-        # =========================
-        features = np.array([
-            [float(request.form[key]) for key in FEATURES]
-        ])
+        features = np.array([[
+            float(request.form.get(key, 0)) for key in FEATURES
+        ]])
 
-        # =========================
-        # SCALE INPUT
-        # =========================
         features_scaled = scaler_X.transform(features)
-
-        # =========================
-        # CONVERT TO TENSOR
-        # =========================
         tensor_input = torch.tensor(features_scaled, dtype=torch.float32)
 
-        # =========================
-        # PREDICTION
-        # =========================
         with torch.no_grad():
             scaled_output = model(tensor_input).numpy()
 
-        # =========================
-        # INVERSE SCALE OUTPUT
-        # =========================
         prediction = scaler_y.inverse_transform(scaled_output)
 
         temp = prediction[0][0]
@@ -143,17 +132,30 @@ def predict():
             prediction_text=f"Error: {str(e)}"
         )
 
+
+# =========================
+# JSON GENERATION (FIXED)
+# =========================
 @app.route("/generate", methods=["POST"])
 def generate():
-    prompt = request.form["prompt"]
-    response = query(prompt)
+    try:
+        data = request.get_json()
 
-    return render_template("index.html", response=response)
+        if not data or "prompt" not in data:
+            return jsonify({"error": "Missing prompt"}), 400
+
+        prompt = data["prompt"]
+        response = query(prompt)
+
+        return jsonify({"response": response})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # =========================
-# MAIN ENTRY
+# MAIN
 # =========================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    app.run(debug=True,host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)
