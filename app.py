@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 
+import requests
 import numpy as np
 import torch
 import torch.nn as nn
@@ -8,20 +9,33 @@ import os
 import traceback
 import math
 
-# Load GPT-2 model
-generator = None
-
-def get_model():
-    global generator
-    if generator is None:
-        from transformers import pipeline
-        generator = pipeline("text-generation", model="gpt2", device=-1)
-    return generator
-
 app = Flask(__name__)
 
+API_URL = "https://api-inference.huggingface.co/models/gpt2"
+HEADERS = {
+    "Authorization": "Bearer YOUR_HF_TOKEN"
+}
+
+def query(prompt):
+    payload = {
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": 50,
+            "temperature": 0.7
+        }
+    }
+
+    response = requests.post(API_URL, headers=HEADERS, json=payload)
+    data = response.json()
+
+    # Handle response safely
+    if isinstance(data, list):
+        return data[0]["generated_text"].replace(prompt, "").strip()
+    else:
+        return "Error: " + str(data)
+
 # =========================
-# MODEL (INLINE - NO model.py)
+# MODEL
 # =========================
 class TemperatureNN(nn.Module):
     def __init__(self):
@@ -127,18 +141,13 @@ def predict():
             prediction_text=f"Error: {str(e)}"
         )
 
-
 @app.route("/generate", methods=["POST"])
 def generate():
     prompt = request.form["prompt"]
-
-    gen = get_model()
-    output = gen(prompt, max_new_tokens=30)
-
-    text = output[0]["generated_text"]
-    response = text.replace(prompt, "").strip()
+    response = query(prompt)
 
     return render_template("index.html", response=response)
+
 
 # =========================
 # MAIN ENTRY
