@@ -224,17 +224,31 @@
 <section class="ai-card">
     <h2 class="title">AI Prompt Engine</h2>
 
-    <!-- FORM ONLY (NO JS) -->
-    <form enctype="application/x-www-form-urlencoded" method="POST" action="/generate">
         <label class="label">Prompt</label>
-        <input class="input" type="text" name="prompt" max-length="150"  placeholder="Type your instruction...">
+        <input class="input" type="text" name="prompt" maxlength="150"  placeholder="Type your instruction..." style="color:dark blue;">
 
-        <button class="btn" type="submit">Generate</button>
-    </form>
+        <button class="btn" onclick="send()">Generate</button>
 
-    {% if response %}
-    <div class="output">{{ response }}</div>
-    {% endif %}
+    <div class="output" id=" out"></div>
 </section>
+
+<script>
+async function send() {
+    const prompt = document.getElementById("prompt").value;
+
+    const res = await fetch("/generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("out").innerText =
+        data.response || data.error || "No response";
+}
+</script>
 </body>
 </html>
