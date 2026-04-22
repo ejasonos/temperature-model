@@ -210,24 +210,24 @@
 <div class="particle" style="left:50%; animation-delay:2s;"></div>
 <div class="particle" style="left:80%; animation-delay:4s;"></div>
 
-<div class="card">
+<section class="card">
     <h1>Weather Temperature Predictor</h1>
     <form  action="/predict" method="POST">
-        <input type="number" step="any" name="humidity" placeholder="Humidity (%)" required><br>
-        <input type="number" step="any" name="windspeed" placeholder="Wind Speed (mph)" required><br>
-        <input type="number" step="any" name="rainfall" placeholder="Rainfall (%)" required><br>
+        <input type="number" step="any" name="humidity" placeholder="Humidity (%)"><br>
+        <input type="number" step="any" name="windspeed" placeholder="Wind Speed (mph)"><br>
+        <input type="number" step="any" name="rainfall" placeholder="Rainfall (%)"><br>
         <button type="submit">Predict Temperature</button>
     </form>
     <h2>{{ prediction_text }}</h2>
-</div>
+</section>
 
-<div class="ai-card">
+<section class="ai-card">
     <h2 class="title">AI Prompt Engine</h2>
 
     <!-- FORM ONLY (NO JS) -->
-    <form method="POST" action="/generate">
+    <form enctype="application/x-www-form-urlencoded" method="POST" action="/generate">
         <label class="label">Prompt</label>
-        <input class="input" type="text" name="prompt" placeholder="Type your instruction..." required>
+        <input class="input" type="text" name="prompt" max-length="150"  placeholder="Type your instruction...">
 
         <button class="btn" type="submit">Generate</button>
     </form>
@@ -235,6 +235,6 @@
     {% if response %}
     <div class="output">{{ response }}</div>
     {% endif %}
-</div>
+</section>
 </body>
 </html>
