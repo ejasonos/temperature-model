@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify
-from transformers import pipeline
 
 import numpy as np
 import torch
@@ -10,7 +9,14 @@ import traceback
 import math
 
 # Load GPT-2 model
-generator = pipeline("text-generation", model="gpt2")
+generator = None
+
+def get_model():
+    global generator
+    if generator is None:
+        from transformers import pipeline
+        generator = pipeline("text-generation", model="gpt2", device=-1)
+    return generator
 
 app = Flask(__name__)
 
@@ -126,10 +132,8 @@ def predict():
 def generate():
     prompt = request.form["prompt"]
 
-    output = generator(
-        prompt,
-        max_new_tokens=60
-    )
+    gen = get_model()
+    output = gen(prompt, max_new_tokens=30)
 
     text = output[0]["generated_text"]
     response = text.replace(prompt, "").strip()
