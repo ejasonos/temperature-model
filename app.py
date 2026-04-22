@@ -1,4 +1,6 @@
-from flask import Flask, request, render_template
+from flask import Flask, render_template, request, jsonify
+from transformers import pipeline
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -6,6 +8,9 @@ import pickle
 import os
 import traceback
 import math
+
+# Load GPT-2 model
+generator = pipeline("text-generation", model="gpt2")
 
 app = Flask(__name__)
 
@@ -116,6 +121,20 @@ def predict():
             prediction_text=f"Error: {str(e)}"
         )
 
+@app.route("/generate", methods=["POST"])
+def generate():
+    data = request.get_json()
+    prompt = data.get("prompt", "")
+
+    output = generator(
+        prompt,
+        max_new_tokens=60,
+        do_sample=True,
+        temperature=0.7
+    )
+
+    response = output[0]["generated_text"].replace(prompt, "").strip()
+    return jsonify({"response": response})
 
 # =========================
 # MAIN ENTRY
