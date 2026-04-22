@@ -228,28 +228,5 @@
 <div class="ai-card">
     <h2 class="title">AI Prompt Engine</h2>
 
-    <div class="label">Prompt</div>
-    <input id="prompt" class="input" placeholder="Type your instruction...">
-
-    <button class="btn" onclick="send()">Generate</button>
-
-    <div class="label output-label">Response</div>
-    <div class="output" id="out"></div>
-</div>
-
-<script>
-async function send() {
-    const prompt = document.getElementById("prompt").value;
-
-    const res = await fetch("/generate", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({prompt})
-    });
-
-    const data = await res.json();
-    document.getElementById("out").innerText = data.response;
-}
-</script>
 </body>
 </html>
