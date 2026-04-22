@@ -128,6 +128,83 @@
         50% { transform: translateY(-400px) translateX(50px) scale(0.8); opacity:0.7; }
         100% { transform: translateY(-800px) translateX(-50px) scale(0.5); opacity:0; }
     }
+    .ai-card {
+    width: 420px;
+    padding: 22px;
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.ai-card .title {
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+.ai-card .label {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-bottom: 6px;
+}
+
+.ai-card .input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+
+    outline: none;
+    margin-bottom: 12px;
+}
+
+.ai-card .input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.ai-card .btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    color: white;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.ai-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+}
+
+.ai-card .output {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+
+    background: rgba(0,0,0,0.25);
+    min-height: 60px;
+    white-space: pre-wrap;
+
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.ai-card .output-label {
+    margin-top: 14px;
+}
 </style>
 </head>
 <body>
@@ -148,5 +225,16 @@
     <h2>{{ prediction_text }}</h2>
 </div>
 
+<div class="ai-card">
+    <h2 class="title">AI Prompt Engine</h2>
+
+    <div class="label">Prompt</div>
+    <input id="prompt" class="input" placeholder="Type your instruction...">
+
+    <button class="btn" onclick="send()">Generate</button>
+
+    <div class="label output-label">Response</div>
+    <div class="output" id="out"></div>
+</div>
 </body>
 </html>
