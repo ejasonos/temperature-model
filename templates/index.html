@@ -221,7 +221,7 @@
     <h2>{{ prediction_text }}</h2>
 </section>
 
-<section class="ai-card">
+<section class="ai-card" style="margin-top: 20px;">
     <h2 class="title">AI Prompt Engine</h2>
 
         <label class="label">Prompt</label>
@@ -236,7 +236,7 @@
 async function send() {
     const prompt = document.getElementById("prompt").value;
 
-    console.log("Sending prompt:", prompt);
+    alert("Sending prompt:", prompt);
 
     const res = await fetch("/generate", {
         method: "POST",
@@ -246,10 +246,10 @@ async function send() {
         body: JSON.stringify({ prompt })
     });
 
-    console.log("Response status:", res.status);
+    alert("Response status:", res.status);
 
     const data = await res.json();
-    console.log("Response data:", data);
+    alert("Response data:", data);
 
     document.getElementById("out").innerText =
         data.response || data.error || "No response";
