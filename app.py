@@ -123,8 +123,9 @@ def generate():
 
         payload = {"inputs": prompt}
         response = requests.post(API_URL, headers=HEADERS, json=payload)
+        generated_text = response.json()[0]["generated_text"]
 
-        return jsonify({"response": response})
+        return generated_text
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
