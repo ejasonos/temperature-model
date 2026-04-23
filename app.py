@@ -125,9 +125,9 @@ def generate():
         response = requests.post(API_URL, headers=HEADERS, json=payload)
         output = response.json()
         generated_text = response.json()[0]["generated_text"]
-        print(output)
+        print(f"output: {output}")
 
-        return generated_text
+        return output
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
