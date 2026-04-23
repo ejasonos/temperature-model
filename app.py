@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-# from huggingface_hub import InferenceClient
+from huggingface_hub import InferenceClient
 
 import requests
 import numpy as np
@@ -16,11 +16,6 @@ app = Flask(__name__)
 # HF setup
 # =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
-API_URL = os.getenv("API_URL")
-HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}",
-    "Content-Type": "application/json"
-}
 
 # =========================
 # MODEL
@@ -121,11 +116,14 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        payload = {"inputs": prompt}
-        response = requests.post(API_URL, headers=HEADERS, json=payload)
-        output = response.json()
-        generated_text = response.json()[0]["generated_text"]
-        print(f"output: {output}")
+        client = InferenceClient(token=HF_TOKEN)
+        response = client.chat_completion(
+    model="google/gemma-2-2b-it",
+    messages=[{"role": "user", "content": prompt}],
+    max_tokens=100,
+    temperature=0.7)
+
+        output = response.choices[0].message.content
 
         return output
 
