@@ -14,11 +14,13 @@ app = Flask(__name__)
 # HF API
 # =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
+API_URL = os.getenv("API_URL")
 
 if not HF_TOKEN:
     raise ValueError("HF_TOKEN not set in environment variables")
+if not API_URL:
+    raise ValueError("API_URL not set in environment variables")
 
-API_URL = "https://api-inference.huggingface.co/models/gpt2"
 HEADERS = {
     "Authorization": f"Bearer {HF_TOKEN}"
 }
@@ -34,7 +36,7 @@ def query(prompt):
         }
 
         response = requests.post(
-            "https://api-inference.huggingface.co/models/gpt2",
+            API_URL,
             headers=HEADERS,
             json=payload,
             timeout=30
@@ -54,10 +56,7 @@ def query(prompt):
         except Exception:
             return f"Non-JSON response: {response.text[:100]}"
 
-        # Handle HF errors
-        if isinstance(data, dict):
-            return f"HF Error: {data.get('error', data)}"
-
+        # Handle HFace response errors
         if isinstance(data, list) and "generated_text" in data[0]:
             return data[0]["generated_text"].replace(prompt, "").strip()
 
@@ -163,6 +162,9 @@ def generate():
             return jsonify({"error": "Missing prompt"}), 400
 
         prompt = data["prompt"]
+        print(f"Prompt from frontend: {prompt}")
+        
+        print("Preparing response")
         response = query(prompt)
 
         return jsonify({"response": response})
