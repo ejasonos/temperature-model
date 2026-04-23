@@ -210,7 +210,9 @@
 <div class="particle" style="left:50%; animation-delay:2s;"></div>
 <div class="particle" style="left:80%; animation-delay:4s;"></div>
 
-<section class="card">
+<main style="display:grid;width:fit-content;">
+<section style="display:flex;width:100%;justify-content:center;" >
+<div class="card">
     <h1>Weather Temperature Predictor</h1>
     <form  action="/predict" method="POST">
         <input type="number" step="any" name="humidity" placeholder="Humidity (%)"><br>
@@ -218,25 +220,30 @@
         <input type="number" step="any" name="rainfall" placeholder="Rainfall (%)"><br>
         <button type="submit">Predict Temperature</button>
     </form>
-    <h2>{{ prediction_text }}</h2>
+    <h2 class="output">{{ prediction_text }}</h2>
+</div>
 </section>
 
-<section class="ai-card" style="margin-top: 20px;">
+<section >
+<div class="ai-card" style="margin-top: 20px;">
     <h2 class="title">AI Prompt Engine</h2>
 
         <label class="label">Prompt</label>
-        <input id="prompt" class="input" type="text" name="prompt" maxlength="150"  placeholder="Type your instruction..." style="color:darkblue;">
+        <input id="prompt" class="input" type="text" name="prompt" maxlength="150"  placeholder="Type your instruction..." style="color:darkblue;" value="" />
 
         <button type="button" class="btn" onclick="send()">Generate</button>
 
-    <pre class="output" id=" out"></pre>
+    <pre class="output" id="out"></pre>
+</div>
 </section>
+</main>
 
 <script>
-async function send() {
-    const prompt = document.getElementById("prompt").value;
 
-    alert("Sending prompt:", prompt);
+async function send() {
+    const prompt = document.querySelector("#prompt").value;
+
+    alert("Sending prompt: "+prompt);
 
     const res = await fetch("/generate", {
         method: "POST",
@@ -246,10 +253,10 @@ async function send() {
         body: JSON.stringify({ prompt })
     });
 
-    alert("Response status:", res.status);
+    alert("Response status:"+res.status);
 
     const data = await res.json();
-    alert("Response data:", data);
+    alert("Response data:"+data);
 
     document.getElementById("out").innerText =
         data.response || data.error || "No response";
