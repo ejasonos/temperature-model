@@ -119,7 +119,7 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        client = InferenceClient(token=HF_TOKEN, provider="hf-inference")
+        client = InferenceClient(token=HF_TOKEN)
         response = client.text_generation(
     model="gpt2",
     prompt=prompt)
