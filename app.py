@@ -17,6 +17,14 @@ app = Flask(__name__)
 # =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
 
+'''
+# Qwen models (reliable on HF Inference)
+response = client.chat_completion(
+    model="Qwen/Qwen2.5-7B-Instruct:hf-inference",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+'''
+
 # =========================
 # MODEL
 # =========================
@@ -116,12 +124,11 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        client = InferenceClient(token=HF_TOKEN)
+        client = InferenceClient()
         response = client.chat_completion(
-    model="google/gemma-2-2b-it",
-    messages=[{"role": "user", "content": prompt}],
-    max_tokens=100,
-    temperature=0.7)
+    model="meta-llama/Llama-3.1-8B-Instruct:hf-inference",
+    messages=[{"role": "user", "content": prompt}]
+)
 
         output = response.choices[0].message.content
 
