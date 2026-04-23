@@ -118,7 +118,7 @@ def generate():
 
         client = InferenceClient(token=HF_TOKEN)   
         response = client.chat_completion(
-    model="nim/meta/llama-3.1-8b-instruct:together", 
+    model="meta-llama/Meta-Llama-3-8B-Instruct-Lite:together", 
     messages=[{"role": "user", "content": prompt}],
     max_tokens=100,
     temperature=0.7)
