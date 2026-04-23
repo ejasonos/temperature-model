@@ -116,12 +116,12 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        client = InferenceClient()
+        client = InferenceClient(token=HF_TOKEN)   
         response = client.chat_completion(
-    model="meta-llama/Llama-3.1-8B-Instruct:hf-inference",
-    messages=[{"role": "user", "content": prompt}]
-)
-
+    model="meta-llama/Llama-3.1-8B-Instruct:together", 
+    messages=[{"role": "user", "content": "Hi!"}],
+    max_tokens=100,
+    temperature=0.7)
         output = response.choices[0].message.content
 
         return output
