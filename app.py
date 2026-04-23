@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, jsonify
+from huggingface_hub import InferenceClient
+
 import requests
 import numpy as np
 import torch
@@ -14,56 +16,25 @@ app = Flask(__name__)
 # HF API
 # =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
-API_URL = os.getenv("API_URL")
+# API_URL = os.getenv("API_URL")
 
 if not HF_TOKEN:
     raise ValueError("HF_TOKEN not set in environment variables")
-if not API_URL:
-    raise ValueError("API_URL not set in environment variables")
+#if not API_URL:
+#    raise ValueError("API_URL not set in environment variables")
 
 HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}"
+    "Authorization": f"Bearer {HF_TOKEN}" 
 }
 
+client = InferenceClient(token=HF_TOKEN)
+
 def query(prompt):
-    try:
-        payload = {
-            "inputs": prompt,
-            "parameters": {
-                "max_new_tokens": 50,
-                "temperature": 0.7
-            }
-        }
-
-        response = requests.post(
-            API_URL,
-            headers=HEADERS,
-            json=payload,
-            timeout=30
-        )
-
-        # DEBUG
-        print("STATUS:", response.status_code)
-        print("RAW TEXT:", response.text[:200])
-
-        # Handle empty response
-        if not response.text.strip():
-            return "Error: Empty response from API"
-
-        # Try parsing JSON safely
-        try:
-            data = response.json()
-        except Exception:
-            return f"Non-JSON response: {response.text[:100]}"
-
-        # Handle HFace response errors
-        if isinstance(data, list) and "generated_text" in data[0]:
-            return data[0]["generated_text"].replace(prompt, "").strip()
-
-        return str(data)
-
-    except requests.exceptions.RequestException as e:
-        return f"Request failed: {str(e)}"
+    return client.text_generation(
+        model="gpt2",
+        prompt=prompt,
+        max_new_tokens=50
+    )
 
 # =========================
 # MODEL
@@ -163,8 +134,7 @@ def generate():
 
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
-        
-        print("Preparing response")
+
         response = query(prompt)
 
         return jsonify({"response": response})
