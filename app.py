@@ -16,9 +16,11 @@ app = Flask(__name__)
 # HF setup
 # =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
-
-if not HF_TOKEN:
-    raise ValueError("HF_TOKEN not set in environment variables")
+API_URL = os.getenv("API_URL")
+HEADERS = {
+    "Authorization": f"Bearer {HF_TOKEN}",
+    "Content-Type": "application/json"
+}
 
 # =========================
 # MODEL
@@ -119,10 +121,8 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        client = InferenceClient(token=HF_TOKEN)
-        response = client.text_generation(
-    model="gpt2",
-    prompt=prompt)
+        payload = {"inputs": prompt
+        response = requests.post(API_URL, headers=HEADERS, json=payload)
 
         return jsonify({"response": response})
 
