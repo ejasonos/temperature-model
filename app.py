@@ -123,7 +123,9 @@ def generate():
 
         payload = {"inputs": prompt}
         response = requests.post(API_URL, headers=HEADERS, json=payload)
+        output = response.json()
         generated_text = response.json()[0]["generated_text"]
+        print(output)
 
         return generated_text
 
