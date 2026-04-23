@@ -121,7 +121,7 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        payload = {"inputs": prompt
+        payload = {"inputs": prompt}
         response = requests.post(API_URL, headers=HEADERS, json=payload)
 
         return jsonify({"response": response})
