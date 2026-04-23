@@ -119,9 +119,9 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        client = InferenceClient(token=HF_TOKEN)
+        client = InferenceClient(token=HF_TOKEN, provider="hf-inference")
         response = client.text_generation(
-    model="gpt2:hf-inference",
+    model="gpt2",
     prompt=prompt)
 
         return jsonify({"response": response})
