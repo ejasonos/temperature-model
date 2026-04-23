@@ -13,28 +13,12 @@ import math
 app = Flask(__name__)
 
 # =========================
-# HF API
+# HF setup
 # =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
-# API_URL = os.getenv("API_URL")
 
 if not HF_TOKEN:
     raise ValueError("HF_TOKEN not set in environment variables")
-#if not API_URL:
-#    raise ValueError("API_URL not set in environment variables")
-
-HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}" 
-}
-
-client = InferenceClient(token=HF_TOKEN)
-
-def query(prompt):
-    return client.text_generation(
-        model="gpt2",
-        prompt=prompt,
-        max_new_tokens=50
-    )
 
 # =========================
 # MODEL
@@ -135,7 +119,11 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        response = query(prompt)
+        client = InferenceClient(token=HF_TOKEN)
+        response = client.text_generation(
+    model="gpt2:hf-inference",
+    prompt=prompt
+)
 
         return jsonify({"response": response})
 
