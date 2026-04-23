@@ -122,8 +122,7 @@ def generate():
         client = InferenceClient(token=HF_TOKEN)
         response = client.text_generation(
     model="gpt2:hf-inference",
-    prompt=prompt
-)
+    prompt=prompt)
 
         return jsonify({"response": response})
 
