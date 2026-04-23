@@ -33,20 +33,38 @@ def query(prompt):
             }
         }
 
-        response = requests.post(API_URL, headers=HEADERS, json=payload, timeout=30)
-        data = response.json()
+        response = requests.post(
+            API_URL,
+            headers=HEADERS,
+            json=payload,
+            timeout=30
+        )
 
-        if isinstance(data, dict) and "error" in data:
-            return f"HF Error: {data['error']}"
+        # DEBUG
+        print("STATUS:", response.status_code)
+        print("RAW TEXT:", response.text[:200])
+
+        # Handle empty response
+        if not response.text.strip():
+            return "Error: Empty response from API"
+
+        # Try parsing JSON safely
+        try:
+            data = response.json()
+        except Exception:
+            return f"Non-JSON response: {response.text[:100]}"
+
+        # Handle HF errors
+        if isinstance(data, dict):
+            return f"HF Error: {data.get('error', data)}"
 
         if isinstance(data, list) and "generated_text" in data[0]:
             return data[0]["generated_text"].replace(prompt, "").strip()
 
         return str(data)
 
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         return f"Request failed: {str(e)}"
-
 
 # =========================
 # MODEL
