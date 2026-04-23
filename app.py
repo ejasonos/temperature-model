@@ -34,7 +34,7 @@ def query(prompt):
         }
 
         response = requests.post(
-            API_URL,
+            "https://api-inference.huggingface.co/models/gpt2",
             headers=HEADERS,
             json=payload,
             timeout=30
