@@ -17,14 +17,6 @@ app = Flask(__name__)
 # =========================
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-'''
-# Qwen models (reliable on HF Inference)
-response = client.chat_completion(
-    model="Qwen/Qwen2.5-7B-Instruct:hf-inference",
-    messages=[{"role": "user", "content": "Hello!"}]
-)
-'''
-
 # =========================
 # MODEL
 # =========================
@@ -142,5 +134,4 @@ def generate():
 # MAIN
 # =========================
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(debug=True)
