@@ -114,7 +114,7 @@ def generate():
         if not data or "prompt" not in data:
             return jsonify({"error": "Missing prompt"}), 400
 
-        prompt = f'Strictly Respond in less than 40 words. Question: {data["prompt"]}'
+        prompt = f'Strictly Respond in less than 40 words. Question: As an Electric Vehicle analyst {data["prompt"]}'
         print(f"Prompt from frontend: {prompt}")
 
         client = OpenAI(
