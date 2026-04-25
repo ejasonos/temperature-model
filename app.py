@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from huggingface_hub import InferenceClient
+from openai import OpenAI
 
 import requests
 import numpy as np
@@ -15,7 +15,8 @@ app = Flask(__name__)
 # =========================
 # HF setup
 # =========================
-HF_TOKEN = os.getenv("HF_TOKEN")
+NVIDIA_TOKEN = os.getenv("NVIDIA_TOKEN")
+BASE_URL = os.getenv("BASE_URL")
 
 # =========================
 # MODEL
@@ -116,12 +117,14 @@ def generate():
         prompt = data["prompt"]
         print(f"Prompt from frontend: {prompt}")
 
-        client = InferenceClient(token=HF_TOKEN)   
-        response = client.chat_completion(
-    model="meta-llama/Meta-Llama-3-8B-Instruct-Lite:together", 
-    messages=[{"role": "user", "content": prompt}],
-    max_tokens=100,
-    temperature=0.7)
+        client = OpenAI(
+  api_key=NVIDIA_TOKEN,
+  base_url=BASE_URL)
+
+        response = client.chat.completions.create(
+    model="minimaxai/minimax-m2.7",
+    messages=[{"role": "user", "content": prompt}])
+
         output = response.choices[0].message.content
 
         return output
