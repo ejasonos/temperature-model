@@ -128,10 +128,10 @@ def generate():
         except Exception as e:
             output = f"Error: {str(e)}"
 
-        return output
+        return jsonify({"res": output})
 
     except Exception as e:
-        return f"Failed: {str(e)}"
+        return jsonify({"res": str(e)})
 
 
 # =========================
