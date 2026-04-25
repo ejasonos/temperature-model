@@ -239,27 +239,45 @@
 </main>
 
 <script>
-
 async function send() {
-    const prompt = document.querySelector("#prompt").value;
+    const promptEl = document.querySelector("#prompt");
+    const outputEl = document.querySelector("#out");
 
-    alert("Sending prompt: "+prompt);
+    const prompt = promptEl.value.trim();
+    if (!prompt) return;
 
-    const res = await fetch("/generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ prompt })
-    });
+    let seconds = 0;
 
-    alert("Response status:"+res.status);
+    // Start thinking effect
+    outputEl.textContent = "Thinking.. 0s";
 
-    const data = await res.json();
-    alert("Response data:"+data);
+    const timer = setInterval(() => {
+        seconds++;
+        outputEl.textContent = "Thinking... " + seconds + "s";
+    }, 1000);
 
-    document.getElementById("out").innerText =
-        data.response || data.error || "No response";
+    try {
+        const res = await fetch("/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+
+        clearInterval(timer);
+
+        // Show response
+        outputEl.textContent =
+            data.response || data.error || "No response";
+
+    } catch (err) {
+        clearInterval(timer);
+
+        outputEl.textContent = "Error: " + err.message;
+    }
 }
 </script>
 </body>
