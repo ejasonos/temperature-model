@@ -114,7 +114,7 @@ def generate():
         if not data or "prompt" not in data:
             return jsonify({"error": "Missing prompt"}), 400
 
-        prompt = data["prompt"]
+        prompt = f'Strictly Respond in less than 40 words. {data["prompt"]}'
         print(f"Prompt from frontend: {prompt}")
 
         client = OpenAI(
@@ -125,7 +125,7 @@ def generate():
             response = client.chat.completions.create(
             model="minimaxai/minimax-m2.7",
             messages=[
-                {"role": "system", "content": "You are an Electric Vehicle mechanics assistant."},
+                {"role": "system", "content": "You are an Electric Vehicle data analyst."},
                 {"role": "user", "content": prompt}
             ])
 
