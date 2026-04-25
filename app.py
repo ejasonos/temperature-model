@@ -16,6 +16,10 @@ app = Flask(__name__)
 # =========================
 NVIDIA_TOKEN = os.getenv("NVIDIA_TOKEN")
 BASE_URL = os.getenv("BASE_URL")
+client = OpenAI(
+  api_key=NVIDIA_TOKEN,
+  base_url=BASE_URL
+)
 
 # =========================
 # MODEL
@@ -45,6 +49,9 @@ try:
     model = TemperatureNN()
     model.load_state_dict(torch.load("temperature_model.pth", map_location="cpu"))
     model.eval()
+
+    for param in model.parameters():
+        param.requires_grad = False
 
     with open("scaler_X.pkl", "rb") as f:
         scaler_X = pickle.load(f)
@@ -111,10 +118,6 @@ def generate():
 
         prompt = f'Strictly Respond in less than 40 words. Question: As an Electric Vehicle analyst {data["prompt"]}'
         print(f"Prompt from frontend: {prompt}")
-
-        client = OpenAI(
-  api_key=NVIDIA_TOKEN,
-  base_url=BASE_URL)
 
         try:
             response = client.chat.completions.create(
