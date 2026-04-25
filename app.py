@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
-import requests
 import numpy as np
 import torch
 import torch.nn as nn
@@ -102,10 +101,6 @@ def predict():
             prediction_text=f"Error: {str(e)}"
         )
 
-
-# =========================
-# JSON GENERATION (FIXED)
-# =========================
 @app.route("/generate", methods=["POST"])
 def generate():
     try:
