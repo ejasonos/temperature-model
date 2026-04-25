@@ -121,11 +121,18 @@ def generate():
   api_key=NVIDIA_TOKEN,
   base_url=BASE_URL)
 
-        response = client.chat.completions.create(
-    model="minimaxai/minimax-m2.7",
-    messages=[{"role": "user", "content": prompt}])
+        try:
+            response = client.chat.completions.create(
+            model="minimaxai/minimax-m2.7",
+            messages=[
+                {"role": "system", "content": "You are an Electric Vehicle mechanics assistant."},
+                {"role": "user", "content": prompt}
+            ])
 
-        output = response.choices[0].message.content
+            output = response.choices[0].message.content
+
+        except Exception as e:
+            output = f"Error: {str(e)}"
 
         return output
 
